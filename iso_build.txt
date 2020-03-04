@@ -1,0 +1,10 @@
+mock -r fedora-31-x86_64 --init
+mock -r fedora-31-x86_64 --install lorax-lmc-novirt vim-minimal pykickstart fedora-kickstarts
+mock -r fedora-27-x86_64 --shell --old-chroot
+
+# in chroot
+ksflatten --config fedora-live-algtest.ks -o flat-fedora-live-algtest.ks --version F31
+livemedia-creator --ks flat-fedora-live-algtest.ks --no-virt --resultdir /var/lmc --project Fedora-algtest-Live --make-iso --volid Fedora-algtest-31 --iso-only --iso-name Fedora-algtest-31-x86_64.iso --releasever 31 --macboot
+
+# exit chroot
+cp /var/lib/mock/fedora-31-x86_64/root/var/lmc/Fedora-algtest-31-x86_64.iso .
