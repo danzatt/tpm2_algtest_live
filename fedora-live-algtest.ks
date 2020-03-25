@@ -22,10 +22,12 @@ network --bootproto=dhcp --device=link --activate
 rootpw --lock --iscrypted locked
 shutdown
 
-%include /usr/share/spin-kickstarts/fedora-repo.ks
-# repo --install --name=tpm2-algtest --baseurl=https://copr-be.cloud.fedoraproject.org/results/dzatovic/fedora-$releasever-$basearch/
+repo --name=fedora --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
+repo --name=updates --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f$releasever&arch=$basearch
+#repo --name=updates-testing --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=updates-testing-f$releasever&arch=$basearch
+url --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
+
 repo --install --name=tpm2-algtest --baseurl=https://copr-be.cloud.fedoraproject.org/results/dzatovic/tpm2-algtest/fedora-$releasever-$basearch/
-#repo --install --name=tpm2-algtest --baseurl=https://copr-be.cloud.fedoraproject.org/results/dzatovic/fedora-31-x86_64/
 
 %packages
 @base-x
@@ -70,11 +72,18 @@ glibc-all-langpacks
 initscripts
 chkconfig
 
+# networking TUI
+
+NetworkManager-tui
+
 # TPM2 stuff
 tpm2-abrmd
 tpm2-tools
 tpm2-algtest
 tpm2_algtest_ui
+
+# add MilanCommander
+mc
 %end
 
 %post
@@ -194,6 +203,10 @@ usermod -aG wheel liveuser > /dev/null
 # Remove root password lock
 passwd -d root > /dev/null
 
+sed -i "s/agetty/agetty --autologin root/" /usr/lib/systemd/system/getty@.service
+systemctl daemon-reload
+systemctl restart getty
+
 # turn off firstboot for livecd boots
 systemctl --no-reload disable firstboot-text.service 2> /dev/null || :
 systemctl --no-reload disable firstboot-graphical.service 2> /dev/null || :
@@ -233,7 +246,7 @@ touch /.liveimg-configured
 # https://bugzilla.redhat.com/show_bug.cgi?id=679486
 # the hostname must be something else than 'localhost'
 # https://bugzilla.redhat.com/show_bug.cgi?id=1370222
-echo "localhost-live" > /etc/hostname
+echo "algtest-live" > /etc/hostname
 
 EOF
 
