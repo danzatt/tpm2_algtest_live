@@ -1,10 +1,25 @@
-VERSION=F31
+VERSION=31
+BASE_KS=algtest-live-base.ks
+GNOME_KS=algtest-live-workstation.ks
+OUT_DIR=build
+
+COMMON_FLAGS=--no-virt --resultdir $(OUT_DIR) --project Fedora-algtest-Live --volid Fedora-algtest-$(VERSION) --releasever $(VERSION) --macboot --lorax-templates templates --proxy=http://localhost:8080 --make-iso
 
 %.ks.flat: %.ks
-	ksflatten --config $< -o $@ --version $(VERSION)
+	ksflatten --config $< -o $@ --version F$(VERSION)
 
-iso: fedora-live-algtest.ks.flat
-	livemedia-creator --ks fedora-live-algtest.ks.flat --no-virt --resultdir /var/lmc --project Fedora-algtest-Live --make-iso --volid Fedora-algtest-31 --iso-only --iso-name Fedora-algtest-31-x86_64.iso --releasever 31 --macboot --proxy=http://localhost:8080
+iso: clean $(BASE_KS).flat
+	livemedia-creator $(COMMON_FLAGS) --ks $(BASE_KS).flat --iso-name Fedora-algtest-$(VERSION)-x86_64.iso
 
-img: fedora-live-algtest.ks.flat
-	livemedia-creator --ks fedora-live-algtest.ks.flat --no-virt --resultdir /var/lmc --project Fedora-algtest-Live --make-disk --volid Fedora-algtest-31 --image-name Fedora-algtest-31-x86_64.img --releasever 31 --macboot --proxy=http://localhost:8080
+gnome_iso: clean $(BASE_KS) $(GNOME_KS).flat
+	livemedia-creator $(COMMON_FLAGS) --ks $(GNOME_KS).flat --iso-name Fedora-algtest-$(VERSION)-x86_64.iso 
+
+img: build/images/boot.iso
+	./build_img.sh build/images/boot.iso
+
+fix_template:
+	cat /usr/share/lorax/templates.d/99-generic/live/x86.tmpl > templates/live/x86.tmpl
+	sed -i "s/configdir=\"tmp.*$\/configdir=\"$(shell echo ../../../../../../../../$$(pwd)/templates/config_files/x86 | sed -e 's/\//\\\//g')\"/" templates/live/x86.tmpl
+
+clean:
+	rm -rf $(OUT_DIR) /var/run/anaconda.pid anaconda/ *.flat

@@ -8,3 +8,7 @@ livemedia-creator --ks flat-fedora-live-algtest.ks --no-virt --resultdir /var/lm
 
 # exit chroot
 cp /var/lib/mock/fedora-31-x86_64/root/var/lmc/Fedora-algtest-31-x86_64.iso .
+
+
+dnf install lorax-lmc-novirt pykickstart fedora-kickstarts
+In /usr/share/spin-kickstarts/fedora-repo.ks uncomment fedora-repo-not-rawhide.ks and comment fedora-repo-rawhide.ks
