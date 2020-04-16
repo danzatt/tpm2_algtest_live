@@ -3,7 +3,7 @@ BASE_KS=algtest-live-base.ks
 GNOME_KS=algtest-live-workstation.ks
 OUT_DIR=build
 
-COMMON_FLAGS=--no-virt --resultdir $(OUT_DIR) --project Fedora-algtest-Live --volid Fedora-algtest-$(VERSION) --releasever $(VERSION) --macboot --lorax-templates templates --proxy=http://localhost:8080 --make-iso
+COMMON_FLAGS=--no-virt --resultdir $(OUT_DIR) --project Fedora-algtest-Live --volid Fedora-algtest-$(VERSION) --releasever $(VERSION) --macboot --lorax-templates templates --make-iso
 
 %.ks.flat: %.ks
 	ksflatten --config $< -o $@ --version F$(VERSION)
