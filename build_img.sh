@@ -44,4 +44,55 @@ sgdisk --largest-new=0 $OUT_IMG --typecode=0700
 
 lodev=$(losetup --show -fP $OUT_IMG)
 mkfs.vfat -F32 -n $PERSISTENT_PART_NAME ${lodev}p2
+
+mkdir mnt
+mount ${lodev}p1 mnt
+UUID=$(grep -e 'UUID=[^ ]*' mnt/EFI/BOOT/grub.cfg -m 1 -o | cut -c6-)
+
+# TODO: copy the config from iso image
+cat > mnt/EFI/BOOT/grub.cfg << EOF
+set default="0"
+
+function load_video {
+  insmod efi_gop
+  insmod efi_uga
+  insmod video_bochs
+  insmod video_cirrus
+  insmod all_video
+}
+
+load_video
+set gfxpayload=keep
+insmod gzio
+insmod part_gpt
+insmod ext2
+
+set timeout=60
+### END /etc/grub.d/00_header ###
+
+search --no-floppy --set=root -l 'Fedora-algtest-31'
+
+### BEGIN /etc/grub.d/10_linux ###
+menuentry 'Start Fedora-algtest-Live 31' --class fedora --class gnu-linux --class gnu --class os {
+	linuxefi /syslinux/vmlinuz root=live:UUID=$UUID rd.live.image rw
+	initrdefi /syslinux/initrd.img
+}
+menuentry 'Test this media & start Fedora-algtest-Live 31' --class fedora --class gnu-linux --class gnu --class os {
+	linuxefi /syslinux/vmlinuz root=live:UUID=$UUID rd.live.image rw rd.live.check
+	initrdefi /syslinux/initrd.img
+}
+menuentry 'Start Fedora-algtest-Live 31 in text mode' --class fedora --class gnu-linux --class gnu --class os {
+	linuxefi /syslinux/vmlinuz root=live:UUID=$UUID rd.live.image rw 4
+	initrdefi /syslinux/initrd.img
+}
+submenu 'Troubleshooting -->' {
+	menuentry 'Start Fedora-algtest-Live 31 in basic graphics mode' --class fedora --class gnu-linux --class gnu --class os {
+		linuxefi /syslinux/vmlinuz root=live:UUID=$UUID rd.live.image rw nomodeset
+		initrdefi /syslinux/initrd.img
+	}
+}
+
+EOF
+
+umount mnt
 losetup -d $lodev
