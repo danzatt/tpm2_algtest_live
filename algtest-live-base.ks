@@ -34,6 +34,12 @@ systemctl restart getty
 
 echo "Please setup networking e.g. by running the 'nmtui' command (if not set up already) and then run 'tpm2-algtest-ui'" > /etc/motd
 echo "algtest-live" > /etc/hostname
+
+if [ -e /dev/disk/by-label/ALGTEST_RES ]; then
+	mkdir -p /mnt/algtest
+	mount -o rw,umask=0000 /dev/disk/by-label/ALGTEST_RES /mnt/algtest
+fi
+
 EOF
 
 chmod 755 /etc/rc.d/init.d/livesys
