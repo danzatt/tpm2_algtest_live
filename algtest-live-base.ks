@@ -4,6 +4,7 @@
 # selinux --disabled
 
 repo --install --name=tpm2-algtest --baseurl=https://copr-be.cloud.fedoraproject.org/results/dzatovic/tpm2-algtest/fedora-$releasever-$basearch/
+timezone Europe/Prague
 
 %packages
 
