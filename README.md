@@ -1,4 +1,4 @@
-The image is currently based on Fedora 31, so it is recommended to be built on Fedora 31 host.
+The image is currently based on Fedora 31, so it is recommended to be built on Fedora 31 host. Current pre-built version is available at https://www.fi.muni.cz/~xzatovic/algtest-usb-disk-v2.img
 
 
 # Dependencies
