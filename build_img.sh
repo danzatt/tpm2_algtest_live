@@ -5,6 +5,7 @@ PERSISTENT_PART_MiB=100
 PERSISTENT_PART_NAME="ALGTEST_RESULTS"
 
 iso_path=$1
+version=$2
 
 iso_size=$(du -b $iso_path | cut -f 1)
 img_size=$(( $iso_size + (100 << 20) )) # add 100 MiB
@@ -21,16 +22,6 @@ lodev=$(losetup --show -fP $OUT_IMG)
 yes | livecd-iso-to-disk --label ALGTST_LIVE --format --efi --reset-mbr --noverify --force $iso_path $lodev
 
 boot_part_end=$(gdisk -l $OUT_IMG | grep EF00 | sed -e 's/^[ ]*\([0-9]\+\)[ ]*\([0-9]\+\)[ ]*\([0-9]\+\).*/\3/g')
-
-# cat | gdisk $OUT_IMG << EOF
-# n
-# 
-# $(( boot_part_end + 1 ))
-# 
-# 0700
-# Y
-# 
-# EOF
 
 losetup -d $lodev
 
@@ -49,7 +40,6 @@ mkdir mnt
 mount ${lodev}p1 mnt
 UUID=$(grep -e 'UUID=[^ ]*' mnt/EFI/BOOT/grub.cfg -m 1 -o | cut -c6-)
 
-# TODO: copy the config from iso image
 cat > mnt/EFI/BOOT/grub.cfg << EOF
 set default="0"
 
@@ -70,23 +60,23 @@ insmod ext2
 set timeout=60
 ### END /etc/grub.d/00_header ###
 
-search --no-floppy --set=root -l 'Fedora-algtest-31'
+search --no-floppy --set=root -l 'Fedora-algtest-${version}'
 
 ### BEGIN /etc/grub.d/10_linux ###
-menuentry 'Start Fedora-algtest-Live 31' --class fedora --class gnu-linux --class gnu --class os {
+menuentry 'Start Fedora-algtest-Live ${version}' --class fedora --class gnu-linux --class gnu --class os {
 	linuxefi /syslinux/vmlinuz root=live:UUID=$UUID rd.live.image rw
 	initrdefi /syslinux/initrd.img
 }
-menuentry 'Test this media & start Fedora-algtest-Live 31' --class fedora --class gnu-linux --class gnu --class os {
+menuentry 'Test this media & start Fedora-algtest-Live ${version}' --class fedora --class gnu-linux --class gnu --class os {
 	linuxefi /syslinux/vmlinuz root=live:UUID=$UUID rd.live.image rw rd.live.check
 	initrdefi /syslinux/initrd.img
 }
-menuentry 'Start Fedora-algtest-Live 31 in text mode' --class fedora --class gnu-linux --class gnu --class os {
+menuentry 'Start Fedora-algtest-Live ${version} in text mode' --class fedora --class gnu-linux --class gnu --class os {
 	linuxefi /syslinux/vmlinuz root=live:UUID=$UUID rd.live.image rw 4
 	initrdefi /syslinux/initrd.img
 }
 submenu 'Troubleshooting -->' {
-	menuentry 'Start Fedora-algtest-Live 31 in basic graphics mode' --class fedora --class gnu-linux --class gnu --class os {
+	menuentry 'Start Fedora-algtest-Live ${version} in basic graphics mode' --class fedora --class gnu-linux --class gnu --class os {
 		linuxefi /syslinux/vmlinuz root=live:UUID=$UUID rd.live.image rw nomodeset
 		initrdefi /syslinux/initrd.img
 	}

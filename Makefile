@@ -15,11 +15,7 @@ gnome_iso: clean $(BASE_KS) $(GNOME_KS).flat
 	livemedia-creator $(COMMON_FLAGS) --ks $(GNOME_KS).flat --iso-name Fedora-algtest-$(VERSION)-x86_64.iso 
 
 img: build/images/boot.iso
-	./build_img.sh build/images/boot.iso
-
-fix_template:
-	cat /usr/share/lorax/templates.d/99-generic/live/x86.tmpl > templates/live/x86.tmpl
-	sed -i "s/configdir=\"tmp.*$\/configdir=\"$(shell echo ../../../../../../../../$$(pwd)/templates/config_files/x86 | sed -e 's/\//\\\//g')\"/" templates/live/x86.tmpl
+	./build_img.sh build/images/boot.iso $(VERSION)
 
 clean:
 	rm -rf $(OUT_DIR) /var/run/anaconda.pid anaconda/ *.flat
