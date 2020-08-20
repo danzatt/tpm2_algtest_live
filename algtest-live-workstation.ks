@@ -120,7 +120,7 @@ AutomaticLoginEnable=True
 AutomaticLogin=liveuser
 FOE
 
-gsettings set org.gnome.desktop.peripherals.touchpad tap-to-click true
+su liveuser -c "gsettings set org.gnome.desktop.peripherals.touchpad tap-to-click true"
 
 # Turn off PackageKit-command-not-found while uninstalled
 if [ -f /etc/PackageKit/CommandNotFound.conf ]; then
@@ -130,6 +130,7 @@ fi
 # make sure to set the right permissions and selinux contexts
 chown -R liveuser:liveuser /home/liveuser/
 restorecon -R /home/liveuser/
+chown liveuser /dev/tpm0
 
 EOF
 

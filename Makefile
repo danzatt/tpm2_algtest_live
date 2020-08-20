@@ -1,4 +1,4 @@
-VERSION=31
+VERSION=32
 BASE_KS=algtest-live-base.ks
 GNOME_KS=algtest-live-workstation.ks
 OUT_DIR=build

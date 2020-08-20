@@ -29,9 +29,14 @@ mc
 %post
 
 cat >> /etc/rc.d/init.d/livesys << EOF
+usermod -aG tss liveuser > /dev/null
+EOF
+
+cat >> /etc/rc.d/init.d/livesys << EOF
 sed -i "s/agetty/agetty --autologin root/" /usr/lib/systemd/system/getty@.service
 systemctl daemon-reload
 systemctl restart getty
+systemctl mask tpm2-abrmd.service
 
 echo "Please setup networking e.g. by running the 'nmtui' command (if not set up already) and then run 'tpm2-algtest-ui'" > /etc/motd
 echo "algtest-live" > /etc/hostname

@@ -84,5 +84,12 @@ submenu 'Troubleshooting -->' {
 
 EOF
 
+sync
+sync
+sync
+
+sleep 1
+
 umount mnt
+rmdir mnt
 losetup -d $lodev
