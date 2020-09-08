@@ -27,6 +27,8 @@ mc
 %end
 
 %post
+sed -i -E "s/(^\%wheel.*)/\# \1/" /etc/sudoers
+sed -i -E "s/^\# (\%wheel[^N]*NOPASSWD.*)/\1/" /etc/sudoers
 
 cat >> /etc/rc.d/init.d/livesys << EOF
 usermod -aG tss liveuser > /dev/null
