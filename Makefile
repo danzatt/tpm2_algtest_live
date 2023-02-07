@@ -1,4 +1,4 @@
-VERSION=32
+VERSION=37
 BASE_KS=algtest-live-base.ks
 GNOME_KS=algtest-live-workstation.ks
 OUT_DIR=build
@@ -9,10 +9,12 @@ COMMON_FLAGS=--no-virt --resultdir $(OUT_DIR) --project Fedora-algtest-Live --vo
 	ksflatten --config $< -o $@ --version F$(VERSION)
 
 iso: clean $(BASE_KS).flat
+	setenforce 0
 	livemedia-creator $(COMMON_FLAGS) --ks $(BASE_KS).flat --iso-name Fedora-algtest-$(VERSION)-x86_64.iso
 
 gnome_iso: clean $(BASE_KS) $(GNOME_KS).flat
-	livemedia-creator $(COMMON_FLAGS) --ks $(GNOME_KS).flat --iso-name Fedora-algtest-$(VERSION)-x86_64.iso 
+	setenforce 0
+	livemedia-creator $(COMMON_FLAGS) --ks $(GNOME_KS).flat --iso-name Fedora-algtest-$(VERSION)-x86_64.iso --vnc vnc=127.0.0.1:8080
 
 img: build/images/boot.iso
 	./build_img.sh build/images/boot.iso $(VERSION)

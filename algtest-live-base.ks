@@ -19,11 +19,12 @@ tpm2-abrmd
 tpm2-tools
 tpm2-algtest
 tpm2_algtest_ui
--glibc-all-langpacks
+libyui-ncurses
 
 vim
 # add MilanCommander
 mc
+openssl
 %end
 
 %post

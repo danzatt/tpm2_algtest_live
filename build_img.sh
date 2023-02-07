@@ -1,17 +1,19 @@
 #!/bin/sh
 
+set -ex
+
 OUT_IMG=algtest-usb-disk.img
-PERSISTENT_PART_MiB=100
-PERSISTENT_PART_NAME="ALGTEST_RESULTS"
+PERSISTENT_PART_MiB=600
+PERSISTENT_PART_NAME="ALGTEST_RES"
 
 iso_path=$1
 version=$2
 
 iso_size=$(du -b $iso_path | cut -f 1)
-img_size=$(( $iso_size + (100 << 20) )) # add 100 MiB
+img_size=$(( $iso_size + (300 << 20) )) # add 100 MiB
 
 #round to blocksize
-img_size=$(( (($img_size << 9) >> 9) + 512))
+img_size=$(( (($img_size >> 9) << 9) + 512))
 
 echo $img_size
 
@@ -34,7 +36,8 @@ sgdisk $OUT_IMG -e
 sgdisk --largest-new=0 $OUT_IMG --typecode=0700
 
 lodev=$(losetup --show -fP $OUT_IMG)
-mkfs.vfat -F32 -n $PERSISTENT_PART_NAME ${lodev}p2
+kpartx $lodev
+mkfs.vfat -F32 -n $PERSISTENT_PART_NAME ${lodev}p4
 
 mkdir mnt
 mount ${lodev}p1 mnt
@@ -92,4 +95,5 @@ sleep 1
 
 umount mnt
 rmdir mnt
+sfdisk --part-type $lodev 4 EBD0A0A2-B9E5-4433-87C0-68B6B72699C7
 losetup -d $lodev

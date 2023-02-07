@@ -40,7 +40,6 @@ install ${configdir}/isolinux.cfg ${BOOTDIR}
 install ${configdir}/boot.msg ${BOOTDIR}
 install ${configdir}/grub.conf ${BOOTDIR}
 install usr/share/anaconda/boot/syslinux-splash.png ${BOOTDIR}/splash.png
-install boot/memtest* ${BOOTDIR}/memtest
 
 ## configure bootloader
 replace @VERSION@ ${product.version} ${BOOTDIR}/grub.conf ${BOOTDIR}/isolinux.cfg ${BOOTDIR}/*.msg
@@ -96,7 +95,7 @@ hardlink ${KERNELDIR}/initrd.img ${BOOTDIR}
 <% filegraft=""; images=["product", "updates"]; compressargs=""; %>
 %if basearch == 'i386':
     # Limit the amount of memory xz uses on i386
-    <% compressargs="--xz -9 --memlimit-compress=3700MiB" %>
+    <% compressargs="--xz -9" %>
 %endif
 %for img in images:
     %if exists("%s/%s/" % (LORAXDIR, img)):
